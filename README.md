@@ -1,2 +1,2 @@
 # Lab3
-JS classes, git, and github
+JS classes and OOP, git, and github
