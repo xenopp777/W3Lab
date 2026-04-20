@@ -12,7 +12,7 @@
 // CS233JS 4/9/26 edited by Zoie D
 // added arrow funcs in index.js and template literal in ui.js
 
-import { gameLogic } from './coreLogic.js'
+import { GameLogic } from './coreLogic.js'
 import { Ui } from './ui.js'
 
 // -------------------- Constants --------------------
@@ -26,6 +26,7 @@ const STARTING_LIVES = 5;
  * and starts the first game.
  */
 const ui = new Ui();
+const gameLogic = new GameLogic();
 
 const init = () => {
   ui.cacheDominoElements();
@@ -34,7 +35,7 @@ const init = () => {
   ui.resetButton.onclick = resetGame;
 
   resetGame();
-}
+};
 
 /**
  * Resets the game state, dealing a new starting hand and resetting score and lives.
@@ -53,7 +54,7 @@ const resetGame = () => {
   ui.showRightDominoBack();
   ui.updateStatus(gameLogic.score, gameLogic.lives, gameLogic.boneyard.length);
   ui.enableGuessButtons();
-}
+};
 
 /**
  * Handles the player clicking "higher" or "lower".
@@ -86,7 +87,7 @@ function processGuess(guess) {
   setTimeout(() => {
     completeRound(isCorrect);
   }, REVEAL_DELAY_MS);
-}
+};
 
 /**
  * Completes the current round by applying the evaluated guess result.
@@ -107,7 +108,7 @@ const completeRound = (isCorrect) => {
         gameLogic.score,
         gameLogic.lives,
         gameLogic.boneyard.length,
-        "You win! Streak of 10.",
+        "You win! Streak of 10."
       );
       return;
     }
@@ -120,7 +121,7 @@ const completeRound = (isCorrect) => {
         gameLogic.score,
         gameLogic.lives,
         gameLogic.boneyard.length,
-        "No more dominos.",
+        "No more dominos."
       );
       return;
     }
@@ -131,7 +132,7 @@ const completeRound = (isCorrect) => {
       gameLogic.score,
       gameLogic.lives,
       gameLogic.boneyard.length,
-      "Correct! Keep the streak going.",
+      "Correct! Keep the streak going."
     );
   } else {
     gameLogic.lives--;
@@ -146,7 +147,7 @@ const completeRound = (isCorrect) => {
         gameLogic.score,
         gameLogic.lives,
         gameLogic.boneyard.length,
-        "No lives left. Game over.",
+        "No lives left. Game over."
       );
       return;
     }
@@ -159,7 +160,7 @@ const completeRound = (isCorrect) => {
         gameLogic.score,
         gameLogic.lives,
         gameLogic.boneyard.length,
-        "No more dominos.",
+        "No more dominos."
       );
       return;
     }
@@ -170,12 +171,12 @@ const completeRound = (isCorrect) => {
       gameLogic.score,
       gameLogic.lives,
       gameLogic.boneyard.length,
-      "Wrong guess. You lost a life.",
+      "Wrong guess. You lost a life."
     );
   }
 
   gameLogic.isResolving = false;
   ui.enableGuessButtons();
-}
+};
 
 window.onload = init;

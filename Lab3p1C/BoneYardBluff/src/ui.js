@@ -100,7 +100,7 @@ export class Ui {
   }
 
   /**
-   * Dispays the right-side domino face up, revealing its actual pips.
+   * Displays the right-side domino face up, revealing its actual pips.
    * @param {Object} domino - The domino object to reveal.
    * @returns {void}
    */

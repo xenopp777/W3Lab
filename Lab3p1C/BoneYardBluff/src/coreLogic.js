@@ -16,22 +16,23 @@ function Domino(leftPips, rightPips) {
   this.rightPips = rightPips;
 }
 
-export const gameLogic = {
-  boneyard: [],
-  currentDomino: null,
-  nextDomino: null,
-  score: 0,
-  lives: STARTING_LIVES,
-  isResolving: false,
-  isGameOver: false,
-
+export class GameLogic {
+  constructor() {
+    this.boneyard = [];
+    this.currentDomino = null;
+    this.nextDomino = null;
+    this.score = 0;
+    this.lives = STARTING_LIVES;
+    this.isResolving = false;
+    this.isGameOver = false;
+  }
 
   /**
    * Fills the boneyard array with all standard dominos.
    * There are 6 X 6 dominos in a standard set.
    * Has no parameters and returns noting.
    */
-  fillBoneyard: function () {
+  fillBoneyard() {
     // TODO: fill the boneyard array with domino objects and reset game state.
     this.boneyard = [];
     for (let l = 0; l <= 6; l++) {
@@ -39,13 +40,13 @@ export const gameLogic = {
         this.boneyard.push(new Domino(l, r));
       }
     }
-  },
+  }
 
   /**
    * Shuffles the dominoes in the boneyard randomly.
    * Has no parameters and eturns nothing.
    */
-  shuffleBoneyard: function () {
+  shuffleBoneyard() {
     // TODO: shuffle the boneyard randomly.
     for (let i = 0; i < this.boneyard.length; i++) {
         let rndIndex = Math.trunc(Math.random() * this.boneyard.length);
@@ -53,28 +54,28 @@ export const gameLogic = {
         this.boneyard[i] = this.boneyard[rndIndex];
         this.boneyard[rndIndex] = temp;
     }
-  },
+  }
 
   /**
    * Deals the first two dominos out of the boneyard: one visible, one hidden.
    * Has no parameters and eturns nothing.
    */
-  dealStartingDominos: function () {
+  dealStartingDominos() {
     // TODO: Choose the two starting dominos, put them in currentDomino and nextDomino.
     this.shuffleBoneyard();
     this.currentDomino = this.boneyard.pop();
     this.nextDomino = this.boneyard.pop();
-  },
+  }
 
   /**
    * Calculates the total sum of pips on a domino.
    * @param {Object} domino - The domino object to sum up.
    * @returns {number} The total number of pips (value of domino).
    */
-  getTotalPips: function (domino) {
+  getTotalPips(domino) {
     // TODO: Add up the total value of the domino
     return domino.leftPips + domino.rightPips;
-  },
+  }
 
   /**
    * Compares the next domino's total pips against the current domino's total pips
@@ -82,7 +83,7 @@ export const gameLogic = {
    * @param {string} guess - The player's guess, either "high" or "low".
    * @returns {boolean} Whether the guess was correct.
    */
-  evaluateGuess: function (guess) {
+  evaluateGuess(guess) {
     const currentTotal = this.getTotalPips(this.currentDomino);
     const nextTotal = this.getTotalPips(this.nextDomino);
     let isCorrect = false;
@@ -95,14 +96,14 @@ export const gameLogic = {
       isCorrect = nextTotal < currentTotal;
     }
     return isCorrect;
-  },
+  }
 
   /**
    * Shifts the hidden domino into the visible spot, and draws a new hidden domino
    * if there are any remaining in the boneyard.
    * Returns nothing
    */
-  advanceRound: function () {
+  advanceRound() {
     // TODO: advance to the next round by shifting dominos and drawing a new hidden domino.
     this.currentDomino = this.nextDomino;
     if (this.boneyard.length > 0) {
@@ -110,5 +111,5 @@ export const gameLogic = {
     } else {
       this.nextDomino = null;
     }
-  },
+  }
 };
