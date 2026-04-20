@@ -1,137 +1,68 @@
+// Edited by Zoie D 4/17/26 with AI assistance of copilot
+
 import Die from './Die.js';
 
 export default class DiceSet {
-    // 
     constructor() {
         this.dice = [];
         for (let i = 0; i < 5; i++) {
             this.dice.push(new Die());
         }
 
-        this.hasFace6 = false;
-        this.hasFace5 = false;
-        this.hasFace4 = false;
-        this.hasFace3 = false;
-        this.hasFace2 = false;
-        this.hasFace1 = false;
+        this.isComplete = false;
     }
 
     rollAll() {
         for (const die of this.dice) {
             die.roll();
         }
+
+        this.autoHoldThrees();
         this.evaluateDice();
     }
 
+    autoHoldThrees() {
+        for (const die of this.dice) {
+            if (die.value === 3 && !die.isHeld) {
+                die.hold();
+            }
+        }
+    }
+
     evaluateDice() {
-        // Reset state so it can be dynamically evaluated based on what the user currently holds.
-        this.hasFace6 = false;
-        this.hasFace5 = false;
-        this.hasFace4 = false;
-        this.hasFace3 = false;
-        this.hasFace2 = false;
-        this.hasFace1 = false;
-
-        // Simply check the pool of manually held dice for the presence of our target qualifiers.
-        let held6 = false;
-        let held5 = false;
-        let held4 = false;
-        let held3 = false;
-        let held2 = false;
-        let held1 = false;
-
-        for (const die of this.dice) {
-            if (die.isHeld) {
-                if (die.value === 6) held6 = true;
-                else if (die.value === 5) held5 = true;
-                else if (die.value === 4) held4 = true;
-            }
-        }
-
-        // Apply rules strictly based on what is currently held: 
-        // Ship unlocks Captain, Captain unlocks Crew
-        /* if (held6) {
-            this.hasShip = true;
-            if (held5) {
-                this.hasCaptain = true;
-                if (held4) {
-                    this.hasCrew = true;
-                }
-            }
-        } */
-        
+        this.isComplete = this.dice.every(die => die.isHeld);
     }
 
-    // Returns true if the player has secured all three qualifiers (Ship, Captain, Crew).
-    isQualified() {
-        return this.hasShip && this.hasCaptain && this.hasCrew;
+    hasHeldDice() {
+        return this.dice.some(die => die.isHeld);
     }
 
-    // Checks if the physical board contains the 6, 5, and 4, regardless of whether 
-    // the user has actually clicked to hold them yet.
-    canPotentiallyQualify() {
-        let has6 = false;
-        let has5 = false;
-        let has4 = false;
-
-        for (const die of this.dice) {
-            if (die.value === 6) has6 = true;
-            if (die.value === 5) has5 = true;
-            if (die.value === 4) has4 = true;
-        }
-
-        return has6 && has5 && has4;
+    isTurnComplete() {
+        return this.isComplete;
     }
 
-    // Validates if the player is legally allowed to hold a newly clicked die.
     canHold(die) {
-        if (die.value === 6 && this.hasShip && !this.isQualified()) return "You already have a Ship! Additional 6s are Cargo.";
-        if (die.value === 5 && !this.hasShip) return "You must secure a Ship (6) before keeping a Captain!";
-        if (die.value === 5 && this.hasCaptain && !this.isQualified()) return "You already have a Captain! Additional 5s are Cargo.";
-        if (die.value === 4 && (!this.hasShip || !this.hasCaptain)) return "You must secure a Captain (5) before keeping a Crew!";
-        if (die.value < 4 && !this.isQualified()) return "You cannot keep Cargo dice until you have a Ship, Captain, and Crew!";
         return true;
     }
 
-    // Validates if the player is legally allowed to un-keep a clicked die.
     canUnhold(die) {
-        if (die.value === 6 && this.hasCaptain) {
-            let held6Count = 0;
-            for (const d of this.dice) {
-                if (d.isHeld && d.value === 6) held6Count++;
-            }
-            if (held6Count === 1) return "You cannot remove your Ship while a Captain is held!";
-        }
-        if (die.value === 5 && this.hasCrew) {
-            let held5Count = 0;
-            for (const d of this.dice) {
-                if (d.isHeld && d.value === 5) held5Count++;
-            }
-            if (held5Count === 1) return "You cannot remove your Captain while a Crew is held!";
+        if (die.value === 3) {
+            return 'All 3s must stay held.';
         }
         return true;
     }
 
-    getCurrentCargoScore() {
-        // A player only scores points if they have acquired the 6, 5, and 4.
-        if (this.isQualified()) {
-            // Because we always play with exactly 5 dice, and the qualifying
-            // Ship/Captain/Crew dice will always sum exactly to 15 (6 + 5 + 4), 
-            // the fastest way to sum the remaining 2 "Cargo" dice is to sum ALL 5 dice 
-            // and subtract the 15 we know comes from the qualifiers.
-            let total = 0;
-            for (const die of this.dice) {
-                total += die.value;
-            }
-            return total; 
+    getScore() {
+        let total = 0;
+        for (const die of this.dice) {
+            total += die.value === 3 ? 0 : die.value;
         }
+        return total;
     }
 
     reset() {
-        this.hasShip = false;
-        this.hasCaptain = false;
-        this.hasCrew = false;
-        
+        this.isComplete = false;
+
         for (const die of this.dice) {
             die.reset();
         }

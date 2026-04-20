@@ -1,8 +1,9 @@
 import DiceSet from './DiceSet.js';
 import Player from './Player.js';
 // Written by Brian Bird, 4/10/2026 using Gemini 3.1 in Antigravity.
+// Edited by Zoie D 4/17/26 with AI assistance of copilot
 
-// This class represents the overall game state and logic. 
+// This class represents the overall game state and logic.
 export default class Game {
     constructor() {
         this.players = [];
@@ -28,7 +29,7 @@ export default class Game {
     }
 
     resetTurnState() {
-        this.rollsLeft = 3;
+        this.rollsPerformed = 0;
         this.diceSet.reset();
     }
 
@@ -37,27 +38,23 @@ export default class Game {
     }
 
     rollDice() {
-        if (this.rollsLeft > 0) {
+        if (this.canRollDice()) {
             this.diceSet.rollAll();
-            this.rollsLeft--;
+            this.rollsPerformed++;
         }
     }
 
-    // Helper methods to abstract end-of-turn game states away from the UI
-    isTurnOver() {
-        return this.rollsLeft === 0;
+    canRollDice() {
+        return !this.diceSet.isTurnComplete() && (this.rollsPerformed === 0 || this.diceSet.hasHeldDice());
     }
 
-    hasBusted() {
-        // Instead of evaluating their currently selected score (which might be 0 just because they haven't clicked yet),
-        // we check if their physical board has the POTENTIAL to score. If not, they've definitively busted.
-        return this.isTurnOver() && !this.diceSet.canPotentiallyQualify();
+    isTurnComplete() {
+        return this.diceSet.isTurnComplete();
     }
 
     endTurn() {
-        // Save score for current player via its setter to respect encapsulation.
         const currentPlayer = this.getCurrentPlayer();
-        currentPlayer.setScore(this.diceSet.getCurrentCargoScore());
+        currentPlayer.setScore(this.diceSet.getScore());
 
         // Advance to next player or end game
         this.currentPlayerIndex++;
@@ -70,18 +67,18 @@ export default class Game {
 
     getWinners() {
         if (!this.isGameOver) return [];
-        
-        let maxScore = -1;
+
+        let minScore = Infinity;
         let winners = [];
 
-        // Loop through all players to find the highest score. 
+        // Loop through all players to find the lowest score.
         // We push to an array instead of just saving one player because ties are possible
-        // and we want to return all players who share the top score.
+        // and we want to return all players who share the lowest score.
         for (const player of this.players) {
-            if (player.score > maxScore) {
-                maxScore = player.score;
+            if (player.score < minScore) {
+                minScore = player.score;
                 winners = [player];
-            } else if (player.score === maxScore) {
+            } else if (player.score === minScore) {
                 winners.push(player);
             }
         }
